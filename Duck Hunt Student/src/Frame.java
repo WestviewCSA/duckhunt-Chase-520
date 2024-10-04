@@ -20,6 +20,8 @@ import javax.swing.Timer;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import java.math.*;
 public class Frame extends JPanel implements ActionListener, MouseListener, KeyListener {
 	//creating objects
 	Font newFont = new Font("Serif", Font.BOLD, 40);
@@ -28,11 +30,14 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	Enemy enemy = new Enemy();
 	Badge badge1 = new Badge();
 	attorney cbt = new attorney();
+	Dog zx = new Dog();
 	
 	//score variables
 	int roundTimer;
 	int score;
 	long time;
+	int num_of_duck;
+	int wait_black;
 	
 	//duck properties
 	int duck_x = 100;
@@ -48,8 +53,12 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	int badge_interval;
 	
 	//bg variables
-	float trans=1.0f;
+	float trans;
 	
+	// booleans
+	boolean end;
+	boolean InAnimation;
+	boolean shaking;
 	//add a method
 	/*
 	 * init an variables, objects etc for the start of the game
@@ -59,6 +68,9 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		roundTimer = 1;
 		score = 0;
 		time = 0;
+		trans=0.0f;
+		wait_black = 0;
+		num_of_duck = (int)Math.random()*10;
 		
 		
 		//duck setups
@@ -72,67 +84,129 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		// cbt setup
 		cbt.setXY(-1500, 100);
 		
+		// zx setup
+		zx.setScale(-0.4, 0.4);
+		zx.setXY(800, 650);
+		zx.toggleHitBox();
+		
 		//enemy setups
 		enemy.setXY(50, 100);
+		enemy.toggleHitBox();
 
 		//background setup
 		bg.setScale(1.5, 1.5);
 		
+		//booleans
+		end = false;
+		InAnimation =false;
+		shaking = false;
 	}
 	/*
 	 * resetting for multiple rounds etc
 	 */
 	
 	public void reset() {
+		init();
+	}
+	
+	
+	
+	public void transition() {
+		System.out.println("in transition");
+		if(trans>=0.95f) {
+			trans = 0.95f;
+		}
+		else{
+			trans += 0.05f;
+		}
+	}
+	
+	public void win_animation() {
+		wait_black += 1;
+		shaking = !shaking;
+		if (cbt.getX()<-500){
+			cbt.setVx(70);
+		}
+		else {
+			cbt.setVx(0);
+			cbt.changePicture("/imgs/cbt1-异议-慢动作.gif");
+			if(wait_black >=20) {
+				bg.changePicture("/imgs/pw_scrolling_prosecution.gif");
+				bg.setScale(10, 20);
+				enemy.shaking(shaking);
+			}
+			
+		}
 		
 	}
 	
-	public void transition() {
-		if(trans<=0.05f) {
-			trans = 0.0f;
-		}
-		else{
-			trans -= 0.05f;
-		}
-		
-		
-	}
+	
 	
 	public void paint(Graphics g) {
 		super.paintComponent(g);
 		
-
+		if (end) {
+			reset();
+		}
 		
 		time += 20; // update time
 		if(time%16==0) {
+			
 			if(time%1000==0) { //has been 1 second
 				roundTimer -= 1;
 			}
 			if(roundTimer <= 0) {
-					//what do you do after one complete round
-					transition();
+				//what do you do after one complete round
+				transition();
+			}
+			if(roundTimer<-1 && score>=0) {
+				InAnimation = true;
+				win_animation();
 			}
 		}
 		
-		
+		// change zx img
+		if(score<=10 && roundTimer<=10) {
+			zx.changePicture("/imgs/zx2-严肃-1.gif");
+		}
+		else if(score>=30 && roundTimer <=5) {
+			zx.changePicture("/imgs/zx2-前倾-1.gif");
+		}
+		else if(score>=20) {
+			zx.changePicture("/imgs/zx2-通常-1.gif");
+		}
 		
 		//change enemy img
+		if(this.score <= 10) {
+			enemy.changePicture("/imgs/yj1-抱胸-1.gif");
+		}
 		if(this.score>=20) {
 			enemy.changePicture("/imgs/red_loser.gif");
 		}
-		else if(this.score>=10) {
+		else if(this.score==10) {
 			enemy.changePicture("/imgs/yj1-崩坏.gif");
 		}
 		
 		
 		
 		
+		
 		//layer your objects as you want them to layer
-		bg.setTrans(trans);
-		bg.paint(g);
-		enemy.paint(g);
-		cbt.paint(g);
-		duck.paint(g);
+		if(end!=true && InAnimation!=true) {
+			bg.setTrans(trans);
+			bg.paint(g);
+			enemy.paint(g);
+			cbt.paint(g);
+			zx.paint(g);
+			duck.paint(g);
+		}
+		else if(InAnimation == true) {
+			bg.setTrans(trans);
+			bg.paint(g);
+			enemy.paint(g);
+			cbt.paint(g);
+		}
+		
 		
 		//update position
 		duck_x += 1;

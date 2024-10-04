@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.net.URL;
+import java.math.*;
 
 public class Character {
 	private Image img;					
@@ -106,6 +107,16 @@ public class Character {
 		this.y = y;
 	}
 	
+	public void shaking(boolean pos) {
+		if(pos) {
+			this.x += 20;
+			this.y += 20;
+		}
+		else {
+			this.x -=20;
+			this.y -=20;
+		}
+	}
 
 	public void changePicture(String newFileName) {
 		img = getImage(newFileName);
@@ -135,6 +146,7 @@ public class Character {
 	private void init(double a, double b) {
 		tx.setToTranslation(a, b);
 		tx.scale(xScale, yScale);
+		tx.rotate(0);
 	}
 
 	private Image getImage(String path) {

@@ -67,14 +67,15 @@ public class GameBackground{
 	public void paint(Graphics g) {
 		//these are the 2 lines of code needed draw an image on the screen
 		Graphics2D g2d = (Graphics2D) g;
-		g2d.setColor(Color.black);
-        g2d.fillRect(0, 0, 1920, 1080);
+		g2d.drawImage(img, tx, null);
+		
 		// 0.5f is 50% transparency
         AlphaComposite composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, this.trans); 
         
 		g2d.setComposite(composite);
 		
-		g2d.drawImage(img, tx, null);
+		g2d.setColor(Color.black);
+        g2d.fillRect(0, 0, 1920, 1080);
 
 	}
 	
