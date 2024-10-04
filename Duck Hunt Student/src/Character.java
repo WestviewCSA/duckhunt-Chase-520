@@ -146,7 +146,6 @@ public class Character {
 	private void init(double a, double b) {
 		tx.setToTranslation(a, b);
 		tx.scale(xScale, yScale);
-		tx.rotate(0);
 	}
 
 	private Image getImage(String path) {

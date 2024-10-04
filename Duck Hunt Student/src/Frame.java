@@ -131,6 +131,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			cbt.setVx(0);
 			cbt.changePicture("/imgs/cbt1-异议-慢动作.gif");
 			if(wait_black >=20) {
+				bg.setTrans(0.0f);
 				bg.changePicture("/imgs/pw_scrolling_prosecution.gif");
 				bg.setScale(10, 20);
 				enemy.shaking(shaking);
