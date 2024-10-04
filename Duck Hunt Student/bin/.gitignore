@@ -1,4 +1,14 @@
-/Duck.class
-/Frame.class
-/Music.class
 /imgs/
+/Background.class
+/Badge.class
+/Character.class
+/Duck.class
+/Enemy.class
+/Frame.class
+/GameBackground.class
+/Music.class
+/StdAudio$1.class
+/StdAudio$BackgroundRunnable.class
+/StdAudio$QueueOfDoubles.class
+/StdAudio.class
+/attorney.class
