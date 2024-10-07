@@ -31,6 +31,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	Badge badge1 = new Badge();
 	attorney cbt = new attorney();
 	Dog zx = new Dog();
+	GameMusic music = new GameMusic();
 	
 	//score variables
 	int roundTimer;
@@ -98,6 +99,10 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		bg.setScale(1.5, 1.5);
 		bg.changePicture("/imgs/Title background.jpg");
 		
+		// Audios
+		music.play();
+
+
 		//booleans
 		start = false;
 		end = false;
@@ -111,9 +116,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	public void reset() {
 		init();
 	}
-	
-	
-	
+
 	public void transition() {
 		System.out.println("in transition");
 		if(trans>=0.95f) {
@@ -264,6 +267,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			}
 		}
 		else{
+			//music.run();
 			bg.paint(g);
 			g.setColor(new Color(141, 8, 1));
 			g.drawString("Press space bar to start", 850, 450);

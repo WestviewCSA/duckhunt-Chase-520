@@ -21,6 +21,7 @@ public class Music  implements Runnable  {
 	public Music(String fileName, boolean loops) {
 		fn = fileName;
 		audioFile = new File(fileName);
+		System.out.println("audio file: "+ audioFile);
 		try {
 			audioStream = AudioSystem.getAudioInputStream(audioFile);
 			AudioFormat format = audioStream.getFormat();
