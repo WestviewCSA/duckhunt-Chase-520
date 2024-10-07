@@ -56,6 +56,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	float trans;
 	
 	// booleans
+	boolean start;
 	boolean end;
 	boolean InAnimation;
 	boolean shaking;
@@ -95,8 +96,10 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 
 		//background setup
 		bg.setScale(1.5, 1.5);
+		bg.changePicture("/imgs/Title background.jpg");
 		
 		//booleans
+		start = false;
 		end = false;
 		InAnimation =false;
 		shaking = false;
@@ -146,117 +149,126 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	public void paint(Graphics g) {
 		super.paintComponent(g);
 		
-		if (end) {
-			reset();
-		}
-		
-		time += 20; // update time
-		if(time%16==0) {
+		if(start){
+			// if the game end
+			if (end) {
+				reset();
+			}
 			
-			if(time%1000==0) { //has been 1 second
-				roundTimer -= 1;
+			time += 20; // update time
+			if(time%16==0) {
+				
+				if(time%1000==0) { //has been 1 second
+					roundTimer -= 1;
+				}
+				if(roundTimer <= 0) {
+					//what do you do after one complete round
+					transition();
+				}
+				if(roundTimer<-1 && score>=0) {
+					InAnimation = true;
+					win_animation();
+				}
 			}
-			if(roundTimer <= 0) {
-				//what do you do after one complete round
-				transition();
+			
+			// change zx img
+			if(score<=10 && roundTimer<=10) {
+				zx.changePicture("/imgs/zx2-严肃-1.gif");
 			}
-			if(roundTimer<-1 && score>=0) {
-				InAnimation = true;
-				win_animation();
+			else if(score>=30 && roundTimer <=5) {
+				zx.changePicture("/imgs/zx2-前倾-1.gif");
+			}
+			else if(score>=20) {
+				zx.changePicture("/imgs/zx2-通常-1.gif");
+			}
+			
+			//change enemy img
+			if(this.score <= 10) {
+				enemy.changePicture("/imgs/yj1-抱胸-1.gif");
+			}
+			if(this.score>=20) {
+				enemy.changePicture("/imgs/red_loser.gif");
+			}
+			else if(this.score==10) {
+				enemy.changePicture("/imgs/yj1-崩坏.gif");
+			}
+			
+			
+			
+			
+			
+			//layer your objects as you want them to layer
+			if(end!=true && InAnimation!=true) {
+				bg.changePicture("/imgs/court-new.jpg");
+				bg.setTrans(trans);
+				bg.paint(g);
+				enemy.paint(g);
+				cbt.paint(g);
+				zx.paint(g);
+				duck.paint(g);
+			}
+			else if(InAnimation == true) {
+				bg.setTrans(trans);
+				bg.paint(g);
+				enemy.paint(g);
+				cbt.paint(g);
+			}
+			
+			
+			//update position
+			duck_x += 1;
+			duck_y += 1;
+			
+			// right score
+			int start_score_x = 1520;
+			int start_score_y = 750;
+			int score_width = 200;
+			int score_height = 100;
+			int score_edge = 10;
+			g.setColor(new Color(141, 8, 1));
+			g.fillRect(start_score_x, start_score_y, score_width, score_height);
+			g.setColor(new Color(255, 255, 255));
+			g.fillRect(start_score_x+score_edge, start_score_y+score_edge, score_width-2*score_edge, score_height-2*score_edge);
+			
+			String score_text = "Score";
+			g.setFont(newFont);
+			g.setColor(new Color(141, 8, 1));
+			g.drawString(score_text, start_score_x+4*score_edge+10, start_score_y+4*score_edge);
+			g.drawString(""+score, start_score_x+85, start_score_y+75);
+			
+			//center life box
+			int life_x = 600;
+			int life_y = 750;
+			int life_width = 700;
+			int life_height = 200;
+			int life_edge = 20;
+			g.setColor(new Color(3, 63, 99));
+			g.fillRect(life_x, life_y, life_width, life_height);
+			g.setColor(new Color(255, 255, 255));
+			g.fillRect(life_x+life_edge, life_y+life_edge, life_width-2*life_edge, life_height-2*life_edge);
+			
+			
+			//Timer display
+			g.drawString(""+this.roundTimer,500, 500);
+			
+			
+			//logic for resetting dog position
+			if(duck.getY()>=400) {
+				//int ran = (int)(Math.random()*400);
+				//System.out.println("ran: "+ ran);
+				duck.setVy(-1*duck.getVy());
+	
+			}
+			else if(duck.getY()<=0) {
+				duck.setVy(-1*duck.getVy());
 			}
 		}
-		
-		// change zx img
-		if(score<=10 && roundTimer<=10) {
-			zx.changePicture("/imgs/zx2-严肃-1.gif");
-		}
-		else if(score>=30 && roundTimer <=5) {
-			zx.changePicture("/imgs/zx2-前倾-1.gif");
-		}
-		else if(score>=20) {
-			zx.changePicture("/imgs/zx2-通常-1.gif");
-		}
-		
-		//change enemy img
-		if(this.score <= 10) {
-			enemy.changePicture("/imgs/yj1-抱胸-1.gif");
-		}
-		if(this.score>=20) {
-			enemy.changePicture("/imgs/red_loser.gif");
-		}
-		else if(this.score==10) {
-			enemy.changePicture("/imgs/yj1-崩坏.gif");
-		}
-		
-		
-		
-		
-		
-		//layer your objects as you want them to layer
-		if(end!=true && InAnimation!=true) {
-			bg.setTrans(trans);
+		else{
 			bg.paint(g);
-			enemy.paint(g);
-			cbt.paint(g);
-			zx.paint(g);
-			duck.paint(g);
-		}
-		else if(InAnimation == true) {
-			bg.setTrans(trans);
-			bg.paint(g);
-			enemy.paint(g);
-			cbt.paint(g);
-		}
-		
-		
-		//update position
-		duck_x += 1;
-		duck_y += 1;
-		
-		// right score
-		int start_score_x = 1520;
-		int start_score_y = 750;
-		int score_width = 200;
-		int score_height = 100;
-		int score_edge = 10;
-		g.setColor(new Color(141, 8, 1));
-		g.fillRect(start_score_x, start_score_y, score_width, score_height);
-		g.setColor(new Color(255, 255, 255));
-		g.fillRect(start_score_x+score_edge, start_score_y+score_edge, score_width-2*score_edge, score_height-2*score_edge);
-		
-		String score_text = "Score";
-		g.setFont(newFont);
-		g.setColor(new Color(141, 8, 1));
-		g.drawString(score_text, start_score_x+4*score_edge+10, start_score_y+4*score_edge);
-		g.drawString(""+score, start_score_x+85, start_score_y+75);
-		
-		//center life box
-		int life_x = 600;
-		int life_y = 750;
-		int life_width = 700;
-		int life_height = 200;
-		int life_edge = 20;
-		g.setColor(new Color(3, 63, 99));
-		g.fillRect(life_x, life_y, life_width, life_height);
-		g.setColor(new Color(255, 255, 255));
-		g.fillRect(life_x+life_edge, life_y+life_edge, life_width-2*life_edge, life_height-2*life_edge);
-		
-		
-		//Timer display
-		g.drawString(""+this.roundTimer,500, 500);
-		
-		
-		//logic for resetting dog position
-		if(duck.getY()>=400) {
-			//int ran = (int)(Math.random()*400);
-			//System.out.println("ran: "+ ran);
-			duck.setVy(-1*duck.getVy());
+			g.setColor(new Color(141, 8, 1));
+			g.drawString("Press space bar to start", 850, 450);
 
 		}
-		else if(duck.getY()<=0) {
-			duck.setVy(-1*duck.getVy());
-		}
-		
 		
 	}
 	
@@ -339,6 +351,9 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	public void keyPressed(KeyEvent arg0) {
 		// TODO Auto-generated method stub
 		System.out.println(arg0.getKeyCode());
+		if(arg0.getKeyCode()==32){
+			start = true;
+		}
 	}
 
 	@Override
