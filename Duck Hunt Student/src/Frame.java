@@ -31,7 +31,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	Badge badge1 = new Badge();
 	attorney cbt = new attorney();
 	Dog zx = new Dog();
-	//GameMusic music = new GameMusic();
+	//GameMusic music = new GameMusic("/Duck Hunt Student/src/audio/Title.wav",true);
 	
 	//score variables
 	int roundTimer;
@@ -72,7 +72,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		roundTimer = 1;
 		score = 0;
 		time = 0;
-		trans=0.0f;
+		trans=0.5f;
 		wait_black = 0;
 		num_of_duck = (int)Math.random()*10;
 		final_animation = 0;
@@ -101,7 +101,9 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		bg.setScale(1.1, 1.1);
 		//bg.changePicture("/imgs/doorBG.jpg");
 		
-		// Audios
+		// 
+		StdAudio.stoploop(false);
+		StdAudio.loopInBackground("/audio/Title.wav");
 		
 
 
@@ -122,7 +124,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	}
 
 	public void transition() {
-		System.out.println("in transition");
+
 		if(trans>=0.95f) {
 			InTransition = false;
 			trans = 0.95f;
@@ -162,25 +164,27 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	
 	public void paint(Graphics g) {
 		super.paintComponent(g);
-		
-		if(start){
+		//System.out.println(t.toString());
+		if(start && InTransition==false){
 			// if the game end
+			
 			if (end) {
 				reset();
 			}
 			
-			time += 20; // update time
+			time += 16; // update time
 			if(time%16==0) {
 				
-				if(time%1000==0) { //has been 1 second
+				if(time%960==0) { //has been 1 second
 					roundTimer -= 1;
 				}
-				if(roundTimer <= 0) {
+				if(roundTimer <= 0 && InTransition) {
 					//what do you do after one complete round
 					transition();
 				}
 				if(roundTimer<-1 && score>=0) {
 					InAnimation = true;
+					t.stop();
 					win_animation();
 				}
 			}
@@ -213,6 +217,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			
 			//layer your objects as you want them to layer
 			if(end!=true && InAnimation!=true) {
+				trans = 0.0f;
 				bg.setScale(1.5, 1.5);
 				bg.changePicture("/imgs/court-new.jpg");
 				bg.setTrans(trans);
@@ -288,13 +293,25 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		}
 		else{
 			//music.run();
-			bg.setTrans(0.5f);
+			bg.setTrans(trans);
 			bg.paint(g);
+			if(start) {
+				time += 16;
+				if(time%16 ==0) {
+					transition();
+				}
+
+				
+			}
 			
 			g.setColor(new Color(255, 255, 255));
 			Font titleFont = new Font("Serif", Font.BOLD, 80);
 			g.setFont(titleFont);
 			g.drawString("Press space bar to start", 450, 450);
+			
+			
+
+			
 
 		}
 		
@@ -316,13 +333,13 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		f.addKeyListener(this);
 		
 		init(); //call init to give properties to the objects
-		
-		Timer t = new Timer(16, this);
+
 		t.start();
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);
 	}
 	
+	Timer t = new Timer(16, this);
 	
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
@@ -357,6 +374,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		
 		if(rMouse.intersects(rMain)) {
 			System.out.println("shooting");
+			
 			StdAudio.playInBackground("/audio/hit.wav");
 			this.score += 1;
 		}
@@ -381,6 +399,8 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		// TODO Auto-generated method stub
 		System.out.println(arg0.getKeyCode());
 		if(arg0.getKeyCode()==32){
+			
+			StdAudio.loopInBackground("/audio/Examiniation Moderate 2001(Av955216805,P5).wav");
 			start = true;
 		}
 	}

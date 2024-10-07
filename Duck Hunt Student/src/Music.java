@@ -1,81 +1,80 @@
-
-
 import java.io.File;
 import java.io.IOException;
+import javax.sound.sampled.*;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.LineEvent;
-import javax.sound.sampled.LineListener;
-import javax.sound.sampled.UnsupportedAudioFileException;
+public class Music implements Runnable {
+    private Thread t;
+    protected File audioFile;
+    protected AudioInputStream audioStream;
+    protected Clip audioClip;
+    protected String fn;
+    private boolean loop;
 
-public class Music  implements Runnable  {
-	Thread t;
-	File audioFile ;
-    AudioInputStream audioStream;
-    Clip audioClip;
-    String fn;
-	public Music(String fileName, boolean loops) {
-		fn = fileName;
-		audioFile = new File(fileName);
-		System.out.println("audio file: "+ audioFile);
-		try {
-			audioStream = AudioSystem.getAudioInputStream(audioFile);
-			AudioFormat format = audioStream.getFormat();
-	        DataLine.Info info = new DataLine.Info(Clip.class, format);
-	        audioClip = (Clip) AudioSystem.getLine(info);
-	        
-	        if(loops) {
-	        	audioClip.loop(audioClip.LOOP_CONTINUOUSLY);;
-	        }	        
-	        audioClip.open(audioStream);
-	        //audioClip.start();
-		} catch (UnsupportedAudioFileException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public void play() {
-		start3();
-	}
-	public void start3() {
-	     t = new Thread (this, fn);
-	     start2();
-	     t.start ();
-	}
-	public void start() {
-	     t = new Thread (this, fn);
-	     t.start ();
-	}
-	public void start2() {
-		audioFile = new File(fn);
-		try {
-			audioStream = AudioSystem.getAudioInputStream(audioFile);
-			AudioFormat format = audioStream.getFormat();
-	        DataLine.Info info = new DataLine.Info(Clip.class, format);
-	        audioClip = (Clip) AudioSystem.getLine(info);
-	        audioClip.open(audioStream);
-	        audioClip.start();
-		} catch (UnsupportedAudioFileException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+    public Music(String fileName, boolean loops) {
+        fn = fileName;
+        loop = loops;
+        initializeAudio();
+    }
 
-	@Override
-	public void run() {
-		 audioClip.start();
-	}
-	
+    // Method to initialize the audio clip
+    protected void initializeAudio() {
+        audioFile = new File(fn);
+        try {
+            audioStream = AudioSystem.getAudioInputStream(audioFile);
+            AudioFormat format = audioStream.getFormat();
+            DataLine.Info info = new DataLine.Info(Clip.class, format);
+            audioClip = (Clip) AudioSystem.getLine(info);
+            audioClip.open(audioStream);
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            e.printStackTrace();
+        }
+    }
 
+    // Method to play the audio (either looped or not)
+    public void play() {
+        if (loop) {
+            audioClip.loop(Clip.LOOP_CONTINUOUSLY);
+        } else {
+            audioClip.start();
+        }
+        startBackgroundThread();
+    }
+
+    // Method to run audio in background thread
+    private void startBackgroundThread() {
+        if (t == null || !t.isAlive()) {
+            t = new Thread(this, fn);
+            t.start();
+        }
+    }
+
+    // Method to stop the audio
+    public void stop() {
+        if (audioClip != null && audioClip.isRunning()) {
+            audioClip.stop();
+        }
+    }
+
+    // Overridable run method for background play
+    @Override
+    public void run() {
+        if (audioClip != null) {
+            audioClip.start();
+        }
+    }
+
+    // Clean up resources
+    public void close() {
+        stop();
+        if (audioClip != null) {
+            audioClip.close();
+        }
+        try {
+            if (audioStream != null) {
+                audioStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

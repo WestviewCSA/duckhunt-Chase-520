@@ -637,34 +637,43 @@ public final class StdAudio {
      *             {@link #stopInBackground()}.
      */
     @Deprecated
+	static
+    boolean stoploop;
+    public void setloop(boolean loop) {
+    	stoploop = true;
+    }
+    
     public static synchronized void loopInBackground(String filename) {
-        if (filename == null) throw new IllegalArgumentException();
+    	if(stoploop!=true) {
+    		if (filename == null) throw new IllegalArgumentException();
 
-        final AudioInputStream ais = getAudioInputStreamFromFile(filename);
+            final AudioInputStream ais = getAudioInputStreamFromFile(filename);
 
-        try {
-            Clip clip = AudioSystem.getClip();
-            // Clip clip = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
-            clip.open(ais);
-            clip.loop(Clip.LOOP_CONTINUOUSLY);
-        }
-        catch (IOException | LineUnavailableException e) {
-            System.out.println(e);
-        }
+            try {
+                Clip clip = AudioSystem.getClip();
+                // Clip clip = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
+                clip.open(ais);
+                clip.loop(Clip.LOOP_CONTINUOUSLY);
+            }
+            catch (IOException | LineUnavailableException e) {
+                System.out.println(e);
+            }
 
-        // keep JVM open
-        new Thread(new Runnable() {
-            public void run() {
-                while (true) {
-                    try {
-                       Thread.sleep(1000);
-                    }
-                    catch (InterruptedException e) {
-                        System.out.println(e);
+            // keep JVM open
+            new Thread(new Runnable() {
+                public void run() {
+                    while (true) {
+                        try {
+                           Thread.sleep(1000);
+                        }
+                        catch (InterruptedException e) {
+                            System.out.println(e);
+                        }
                     }
                 }
-            }
-        }).start();
+            }).start();
+    	}
+        
     }
 
 
