@@ -100,7 +100,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		bg.changePicture("/imgs/Title background.jpg");
 		
 		// Audios
-		music.play();
+		//music.play();
 
 
 		//booleans
