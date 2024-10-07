@@ -11,7 +11,7 @@ public class Background extends GameBackground{
 
 
 	public Background() {
-		super("court-new.jpg");
+		super("Title background.jpg");
 
 	}
 	

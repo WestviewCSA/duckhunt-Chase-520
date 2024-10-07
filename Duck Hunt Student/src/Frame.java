@@ -31,7 +31,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	Badge badge1 = new Badge();
 	attorney cbt = new attorney();
 	Dog zx = new Dog();
-	GameMusic music = new GameMusic();
+	//GameMusic music = new GameMusic();
 	
 	//score variables
 	int roundTimer;
@@ -39,6 +39,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	long time;
 	int num_of_duck;
 	int wait_black;
+	int final_animation;
 	
 	//duck properties
 	int duck_x = 100;
@@ -60,6 +61,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	boolean start;
 	boolean end;
 	boolean InAnimation;
+	boolean InTransition;
 	boolean shaking;
 	//add a method
 	/*
@@ -73,7 +75,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		trans=0.0f;
 		wait_black = 0;
 		num_of_duck = (int)Math.random()*10;
-		
+		final_animation = 0;
 		
 		//duck setups
 		duck.setScale(0.3, 0.3);
@@ -96,17 +98,19 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		enemy.toggleHitBox();
 
 		//background setup
-		bg.setScale(1.5, 1.5);
-		bg.changePicture("/imgs/Title background.jpg");
+		bg.setScale(1.1, 1.1);
+		//bg.changePicture("/imgs/doorBG.jpg");
 		
 		// Audios
-		//music.play();
+		
+
 
 
 		//booleans
 		start = false;
 		end = false;
 		InAnimation =false;
+		InTransition = false;
 		shaking = false;
 	}
 	/*
@@ -120,9 +124,11 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	public void transition() {
 		System.out.println("in transition");
 		if(trans>=0.95f) {
+			InTransition = false;
 			trans = 0.95f;
 		}
 		else{
+			InTransition = true;
 			trans += 0.05f;
 		}
 	}
@@ -137,10 +143,15 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			cbt.setVx(0);
 			cbt.changePicture("/imgs/cbt1-异议-慢动作.gif");
 			if(wait_black >=20) {
-				bg.setTrans(0.0f);
+				final_animation += 1;
+				trans = 0.0f;
+				//bg.setTrans(0.0f);
 				bg.changePicture("/imgs/pw_scrolling_prosecution.gif");
 				bg.setScale(10, 20);
 				enemy.shaking(shaking);
+			if(final_animation>=60) {
+				end =true;
+			}
 			}
 			
 		}
@@ -202,6 +213,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			
 			//layer your objects as you want them to layer
 			if(end!=true && InAnimation!=true) {
+				bg.setScale(1.5, 1.5);
 				bg.changePicture("/imgs/court-new.jpg");
 				bg.setTrans(trans);
 				bg.paint(g);
@@ -250,6 +262,14 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			g.setColor(new Color(255, 255, 255));
 			g.fillRect(life_x+life_edge, life_y+life_edge, life_width-2*life_edge, life_height-2*life_edge);
 			
+			// badge=life display
+			int badge_y = 800;
+			int badge_x = 700;
+			badge1.toggleHitBox();
+			badge1.setScale(0.2, 0.2);
+			badge1.setXY(badge_x, badge_y);
+			badge1.paint(g);
+			
 			
 			//Timer display
 			g.drawString(""+this.roundTimer,500, 500);
@@ -268,9 +288,13 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		}
 		else{
 			//music.run();
+			bg.setTrans(0.5f);
 			bg.paint(g);
-			g.setColor(new Color(141, 8, 1));
-			g.drawString("Press space bar to start", 850, 450);
+			
+			g.setColor(new Color(255, 255, 255));
+			Font titleFont = new Font("Serif", Font.BOLD, 80);
+			g.setFont(titleFont);
+			g.drawString("Press space bar to start", 450, 450);
 
 		}
 		
@@ -333,6 +357,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		
 		if(rMouse.intersects(rMain)) {
 			System.out.println("shooting");
+			StdAudio.playInBackground("/audio/hit.wav");
 			this.score += 1;
 		}
 		

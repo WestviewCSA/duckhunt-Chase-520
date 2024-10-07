@@ -1,1 +1,16 @@
-/GameMusic
+/audio/
+/imgs/
+/Background.class
+/Badge.class
+/Character.class
+/Dog.class
+/Duck.class
+/Duck2.class
+/Enemy.class
+/Frame.class
+/GameBackground.class
+/GameHitSound.class
+/GameMusic.class
+/Music.class
+/StdAudio$QueueOfDoubles.class
+/attorney.class
