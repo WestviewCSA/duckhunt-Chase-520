@@ -11,7 +11,7 @@ public class Dog extends Character{
 
 
 	public Dog()  {
-		super("zx2-前倾-1.gif");
+		super("zx1-元气.png");
 	}
 
 

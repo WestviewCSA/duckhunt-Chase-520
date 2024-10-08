@@ -110,11 +110,11 @@ public class Character {
 	public void shaking(boolean pos) {
 		if(pos) {
 			this.x += 20;
-			this.y += 20;
+			this.y += 5;
 		}
 		else {
 			this.x -=20;
-			this.y -=20;
+			this.y -=5;
 		}
 	}
 

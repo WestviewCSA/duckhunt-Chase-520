@@ -639,8 +639,8 @@ public final class StdAudio {
     @Deprecated
 	static
     boolean stoploop;
-    public void setloop(boolean loop) {
-    	stoploop = true;
+    public static void stoploop(boolean loop) {
+    	stoploop = loop;
     }
     
     public static synchronized void loopInBackground(String filename) {
