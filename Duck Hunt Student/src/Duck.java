@@ -11,6 +11,6 @@ public class Duck extends Character{
 
 
 	public Duck() {
-		super("objection_word.gif");
+		super("whiteObjection.png");
 	}
 }

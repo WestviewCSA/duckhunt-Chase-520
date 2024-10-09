@@ -122,7 +122,11 @@ public class Character {
 		img = getImage(newFileName);
 		init(x, y);
 	}
-
+	
+	public double getScale() {
+		return this.xScale;
+	}
+	
 	public void paint(Graphics g) {
 		// these are the 2 lines of code needed draw an image on the screen
 		Graphics2D g2 = (Graphics2D) g;
@@ -148,6 +152,7 @@ public class Character {
 		tx.scale(xScale, yScale);
 	}
 
+	
 	private Image getImage(String path) {
 		Image tempImage = null;
 		try {

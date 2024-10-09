@@ -29,6 +29,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	Background bg = new Background();
 	Enemy enemy = new Enemy();
 	Badge badge1 = new Badge();
+	Badge badge2 = new Badge();
 	attorney cbt = new attorney();
 	Dog zx = new Dog();
 	//GameMusic music = new GameMusic("/Duck Hunt Student/src/audio/Title.wav",true);
@@ -65,13 +66,14 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	boolean InTransition;
 	boolean shaking;
 	boolean catch_duck;
+	boolean go_to_score;
 	//add a method
 	/*
 	 * init an variables, objects etc for the start of the game
 	 */
 	public void init() {
 		//timer & score
-		roundTimer = 100;
+		roundTimer = 1;
 		score = 0;
 		time = 0;
 		trans=0.5f;
@@ -89,7 +91,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		//duck.setXY(duck_x, duck_y);
 		
 		// cbt setup
-		cbt.setXY(-1500, 100);
+		cbt.setXY(-1500, 0);
 		
 		// zx setup
 		zx.setScale(0.4, 0.4);
@@ -97,7 +99,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		zx.setVx(dog_speed);
 //		zx.setWidth(500);
 //		zx.setHeight(300);
-		//zx.toggleHitBox();
+		zx.toggleHitBox();
 		
 		//enemy setups
 		enemy.setXY(50, 100);
@@ -124,6 +126,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		InTransition = true;
 		shaking = false;
 		catch_duck = false;
+		go_to_score = false;
 	}
 	/*
 	 * resetting for multiple rounds etc
@@ -135,7 +138,40 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		zx.toggleHitBox();
 		badge1.toggleHitBox();
 	}
+	
+	public void reset_duck(Duck myduck) {
+		go_to_score = false;
+		catch_duck = false;
+		int ran = (int)(Math.random()*(400));
+		int newx = (int)(Math.random()*(1900));
+		int newy = 50 + ran;
+		myduck.setXY(newx, newy);
+		
+		int speed = (int)(Math.random()*15);
+		System.out.println(speed);
+		myduck.setVx(speed);
+		myduck.setVy(speed-3);
+	}
 
+	public void duck_score(Duck myduck,int score_x, int score_y) {
+		int deltax = score_x - myduck.getX();
+		int deltay = score_y - myduck.getY();
+		myduck.setVx(deltax/60*2); 
+		myduck.setVy(deltay/60*2);
+		double descale = (0.3)/60*3;
+		myduck.setScale(myduck.getScale()-descale, myduck.getScale()-descale);
+		if(!go_to_score) {
+			if (myduck.getY()>=400) {
+				myduck.setVx(0);
+				myduck.setVy(0);
+				reset_duck(duck);
+				go_to_score = true;
+				
+			}
+		}
+		
+	}
+	
 	public void transition(boolean reverse) {
 		if(!reverse) {
 			if(trans>=0.98f) {
@@ -167,17 +203,19 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			StdAudio.playInBackground("/audio/Phoenix Wright Objection! 2001(Av955216805,P7).wav");
 		}
 		if (cbt.getX()<-500){
+			cbt.changePicture("/imgs/cbt1-集中.png");
 			cbt.setVx(70);
 		}
 		else {
 			cbt.setVx(0);
-			cbt.changePicture("/imgs/cbt1-异议-慢动作.gif");
-			if(wait_black >=15) {
+			//bg.setTrans(0.0f);
+			bg.changePicture("/imgs/pw_scrolling_prosecution.gif");
+			bg.setScale(10, 20);
+			if(wait_black >=60*1) {
+				cbt.changePicture("/imgs/cbt1-异议-动作.gif");
 				final_animation += 1;
 				trans = 0.0f;
-				//bg.setTrans(0.0f);
-				bg.changePicture("/imgs/pw_scrolling_prosecution.gif");
-				bg.setScale(10, 20);
+				
 				enemy.shaking(shaking);
 			if(final_animation>=60*5) {
 				end =true;
@@ -230,15 +268,23 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 //			}
 			
 			//change enemy img
-			if(this.score <= 10) {
-				enemy.changePicture("/imgs/yj1-抱胸-1.gif");
-			}
+			
 			if(this.score>=20) {
 				enemy.changePicture("/imgs/red_loser.gif");
+			}
+			else if(this.score==14) {
+				enemy.changePicture("/imgs/yj1-扶桌-拍桌.gif");
+			}
+			else if(this.score>10) {
+				enemy.changePicture("/imgs/yj1-扶桌.png");
 			}
 			else if(this.score==10) {
 				enemy.changePicture("/imgs/yj1-崩坏.gif");
 			}
+			else if(this.score <= 10) {
+				enemy.changePicture("/imgs/yj1-抱胸-1.gif");
+			}
+			
 			
 			
 			
@@ -253,7 +299,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 				bg.paint(g);
 				enemy.paint(g);
 				//cbt.paint(g);
-				zx.paint(g);
+				//zx.paint(g);
 				duck.paint(g);
 			}
 			else if(InAnimation == true) {
@@ -323,9 +369,13 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			g.drawString("Your time: ",timebar_x+time_edge+40, timebar_y+time_edge+50);
 			g.drawString(""+this.roundTimer,timebar_x+time_edge+120, timebar_y+time_edge+120);
 			
+			//paint the dog
+			if(end!=true && InAnimation!=true) {
+				zx.paint(g);
+			}
 			
 			//logic for resetting duck position
-			if(duck.getY()>=800) {
+			if(duck.getY()>=400) {
 				//int ran = (int)(Math.random()*400);
 				//System.out.println("ran: "+ ran);
 				duck.setVy(-1*duck.getVy());
@@ -335,13 +385,19 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 				duck.setVy(-1*duck.getVy());
 			}
 			
+			if(duck.getX()<=0) {
+				duck.setVx(-1*duck.getVx());
+			}
+			else if(duck.getX()>=1750) {
+				duck.setVx(-1*duck.getVx());
+			}
 			
 			//dog moving
 			//zx.setVx(dog_speed);
 			// bouncing
-			System.out.println("zx location:"+zx.getX()+" "+zx.getY());
-			System.out.println("current speed: "+ zx.getVx());
-			if(zx.getX()>1400) {
+//			System.out.println("zx location:"+zx.getX()+" "+zx.getY());
+//			System.out.println("current speed: "+ zx.getVx());
+			if(zx.getX()>1700) {
 				zx.setVx(-1*zx.getVx());
 			}
 			else if(zx.getX()<=-400) {
@@ -362,13 +418,30 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			//reset dog
 			if(catch_duck) {
 				zx.setVy(10);
-				if(zx.getY()==650) {
+				//duck_score(duck,start_score_x+85,start_score_y+75);
+				if(zx.getY()>=600) {
 					zx.setVy(0);
 					zx.setVx(10);
 					zx.changePicture("/imgs/zx1-元气.png");
 					catch_duck = false;
+					reset_duck(duck);
 				}
 			}
+			
+			//reset duck
+			if(catch_duck) {
+				duck.setScale(0.3, 0.3);
+				duck.changePicture("/imgs/objection_word.gif");
+			}
+			else {
+				duck.setScale(0.5, 0.5);
+				duck.changePicture("/imgs/whiteObjection.png");
+			}
+			
+			
+			//dubug area:
+			System.out.println("duck x,y: "+ duck.getX()+" "+duck.getY());
+			System.out.println("duck vx, vy: "+ duck.getVx()+ " "+ duck.getVy());
 			
 			
 			
@@ -465,10 +538,19 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			
 			duck.setVx(0);
 			duck.setVy(0);
+
 			
-			zx.setVx((duck.getX()-zx.getX()-200)/60*3);
-			zx.setVy(-1*Math.abs(duck.getY()-zx.getY()-200)/60*3);
-			this.score += 1;
+			if(!catch_duck && (duck.getVx()<=5&&duck.getVy()<=5)) {
+				if(zx.getVy()==0) {
+					this.score += 1;
+				}
+				System.out.println("You are in socre +1");
+				zx.setVx((duck.getX()-zx.getX()-200)/60*3);
+				zx.setVy(-1*Math.abs(duck.getY()-zx.getY()-200)/60*3);
+				
+				
+			}
+			
 			
 		}
 		
