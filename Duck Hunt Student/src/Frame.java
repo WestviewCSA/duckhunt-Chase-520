@@ -26,6 +26,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	//creating objects
 	Font newFont = new Font("Serif", Font.BOLD, 40);
 	Duck duck = new Duck();
+	Duck objection = new Duck();
 	Background bg = new Background();
 	Enemy enemy = new Enemy();
 	Badge badge1 = new Badge();
@@ -38,10 +39,11 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	int roundTimer;
 	int score;
 	long time;
-	int num_of_duck;
+	int duck_speed;
 	int wait_black;
 	int final_animation;
 	int dog_speed;
+	int final_hit;
 	
 	//duck properties
 	int duck_x = 100;
@@ -73,21 +75,26 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	 */
 	public void init() {
 		//timer & score
-		roundTimer = 1;
+		roundTimer = 10;
 		score = 0;
 		time = 0;
 		trans=0.5f;
 		wait_black = 0;
-		num_of_duck = (int)Math.random()*10;
+		duck_speed = (int)(Math.random()*30);
 		final_animation = 0;
 		dog_speed = 25;
+		final_hit = 0;
 		
 		//duck setups
 		duck.setScale(0.3, 0.3);
 		duck.setWidth(150);
 		duck.setHeight(100);
-		duck.setVx(0);
-		duck.setVy(10);
+		duck.setVx(duck_speed);
+		duck.setVy(duck_speed);
+		
+		objection.setScale(1.3, 1.3);
+		objection.changePicture("/imgs/objection_word.gif");
+		objection.toggleHitBox();
 		//duck.setXY(duck_x, duck_y);
 		
 		// cbt setup
@@ -134,6 +141,9 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	
 	public void reset() {
 		init();
+		start=false;
+		enemy.setVx(0);
+		enemy.setVy(0);
 		enemy.toggleHitBox();
 		zx.toggleHitBox();
 		badge1.toggleHitBox();
@@ -143,14 +153,14 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		go_to_score = false;
 		catch_duck = false;
 		int ran = (int)(Math.random()*(400));
-		int newx = (int)(Math.random()*(1900));
-		int newy = 50 + ran;
+		int newx = (int)(Math.random()*(1400));
+		int newy = ran;
 		myduck.setXY(newx, newy);
 		
 		int speed = (int)(Math.random()*15);
 		System.out.println(speed);
-		myduck.setVx(speed);
-		myduck.setVy(speed-3);
+		myduck.setVx(15+speed);
+		myduck.setVy(12+speed);
 	}
 
 	public void duck_score(Duck myduck,int score_x, int score_y) {
@@ -174,23 +184,23 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	
 	public void transition(boolean reverse) {
 		if(!reverse) {
-			if(trans>=0.98f) {
+			if(trans>=0.995f) {
 				InTransition = false;
-				trans = 0.98f;
+				trans = 0.995f;
 			}
 			else{
 				InTransition = true;
-				trans += 0.02f;
+				trans += 0.005f;
 			}
 		}
 		else {
-			if(trans<=0.02f) {
+			if(trans<=0.005f) {
 				InTransition = false;
-				trans = 0.02f;
+				trans = 0.005f;
 			}
 			else{
 				InTransition = true;
-				trans -= 0.02f;
+				trans -= 0.005f;
 			}
 		}
 	}
@@ -203,6 +213,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			StdAudio.playInBackground("/audio/Phoenix Wright Objection! 2001(Av955216805,P7).wav");
 		}
 		if (cbt.getX()<-500){
+			objection.setXY(-1000, -1000);
 			cbt.changePicture("/imgs/cbt1-集中.png");
 			cbt.setVx(70);
 		}
@@ -211,15 +222,23 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			//bg.setTrans(0.0f);
 			bg.changePicture("/imgs/pw_scrolling_prosecution.gif");
 			bg.setScale(10, 20);
-			if(wait_black >=60*1) {
+			if(wait_black >=(int)60*1.5) {
+				if (wait_black==(int)60*1.5) {
+					StdAudio.playInBackground("/imgs/Objection_Audio.wav");
+				}
+				cbt.setScale(1.5, 1.5);
+				cbt.setXY(-500, 50);
 				cbt.changePicture("/imgs/cbt1-异议.png");
-				
+				objection.setXY(600, 200);
+				enemy.setVx(2);
+				enemy.changePicture("/imgs/yj1-崩坏.gif");
 				final_animation += 1;
-				trans = 0.0f;
-				
+				trans = 0.0f;		
 				enemy.shaking(shaking);
-			if(final_animation>=60*5) {
+				
+			if(final_animation>=60*4) {
 				end =true;
+				StdAudio.stopInBackground();
 
 			}
 			}
@@ -236,24 +255,31 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		
 		
 		if(start && InTransition==false){
-			// if the game end
-			
-			
-			
+			if(time==0) {
+				trans = 0.0f;
+				StdAudio.stopInBackground();
+				//StdAudio.playInBackground("/audio/Examiniation Moderate 2001(Av955216805,P5).wav");
+			}
 			time += 16; // update time
 			if(time%16==0) {
 				
 				if(time%960==0) { //has been 1 second
 					roundTimer -= 1;
 				}
-				if(roundTimer <= 0 && InTransition) {
-					//what do you do after one complete round
-					transition(false);
-				}
-				if(roundTimer<-1 && score>=0) {
+				if(roundTimer<=0 && score>=12) {
 					InAnimation = true;
 					//t.stop();
 					win_animation();
+				}
+				else if(roundTimer<=0&& score<12) {
+					StdAudio.stopInBackground();
+					StdAudio.playInBackground("/audio/fails.wav");
+					transition(false);
+					if (InTransition==false) {
+						start =false;
+						end = true;
+						reset();
+					}
 				}
 			}
 			
@@ -269,22 +295,24 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 //			}
 			
 			//change enemy img
+			if(InAnimation!=true) {
+				if(this.score>=18) {
+					enemy.changePicture("/imgs/red_loser.gif");
+				}
+				else if(this.score==14) {
+					enemy.changePicture("/imgs/yj1-扶桌-拍桌.gif");
+				}
+				else if(this.score>10) {
+					enemy.changePicture("/imgs/yj1-扶桌.png");
+				}
+				else if(this.score==10) {
+					enemy.changePicture("/imgs/yj1-崩坏.gif");
+				}
+				else if(this.score <= 10) {
+					enemy.changePicture("/imgs/yj1-抱胸-1.gif");
+				}
+			}
 			
-			if(this.score>=20) {
-				enemy.changePicture("/imgs/red_loser.gif");
-			}
-			else if(this.score==14) {
-				enemy.changePicture("/imgs/yj1-扶桌-拍桌.gif");
-			}
-			else if(this.score>10) {
-				enemy.changePicture("/imgs/yj1-扶桌.png");
-			}
-			else if(this.score==10) {
-				enemy.changePicture("/imgs/yj1-崩坏.gif");
-			}
-			else if(this.score <= 10) {
-				enemy.changePicture("/imgs/yj1-抱胸-1.gif");
-			}
 			
 			
 			
@@ -293,7 +321,6 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			
 			//layer your objects as you want them to layer
 			if(end!=true && InAnimation!=true) {
-				trans = 0.0f;
 				bg.setScale(1.5, 1.5);
 				bg.changePicture("/imgs/court-new.jpg");
 				bg.setTrans(trans);
@@ -308,6 +335,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 				bg.paint(g);
 				enemy.paint(g);
 				cbt.paint(g);
+				objection.paint(g);
 			}
 			
 			
@@ -354,6 +382,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			
 			
 			
+			
 			//Time frame
 			int timebar_x = 200;
 			int timebar_y = 750;
@@ -389,7 +418,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			if(duck.getX()<=0) {
 				duck.setVx(-1*duck.getVx());
 			}
-			else if(duck.getX()>=1750) {
+			else if(duck.getX()>=1550) {
 				duck.setVx(-1*duck.getVx());
 			}
 			
@@ -441,6 +470,8 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			
 			
 			//dubug area:
+			System.out.println("\n");
+			System.out.println("You are in the painting loop");
 			System.out.println("duck x,y: "+ duck.getX()+" "+duck.getY());
 			System.out.println("duck vx, vy: "+ duck.getVx()+ " "+ duck.getVy());
 			
@@ -467,7 +498,10 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			g.setFont(titleFont);
 			g.drawString("Press space bar to start", 450, 450);
 			
+			time=0;
 			//debug
+			System.out.println("\n");
+			System.out.println("You have't start the game");
 			System.out.println("trans: "+trans);
 			System.out.println("time: "+time);
 			System.out.println("start: "+start);
@@ -523,7 +557,8 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	@Override
 	public void mousePressed(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+		System.out.println("shooting");
+		StdAudio.playInBackground("/audio/hit.wav");
 		Rectangle rMouse = new Rectangle(arg0.getX()-15, arg0.getY()-15,30, 30); //guess and check mouse display
 		
 		Rectangle rMain = new Rectangle(
@@ -534,26 +569,19 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 				);
 		
 		if(rMouse.intersects(rMain)) {
-			System.out.println("shooting");
-			StdAudio.playInBackground("/audio/hit.wav");
-			
 			duck.setVx(0);
 			duck.setVy(0);
-
-			
 			if(!catch_duck && (duck.getVx()<=5&&duck.getVy()<=5)) {
 				if(zx.getVy()==0) {
-					this.score += 1;
+					this.score += 3;
 				}
 				System.out.println("You are in socre +1");
 				zx.setVx((duck.getX()-zx.getX()-200)/60*3);
 				zx.setVy(-1*Math.abs(duck.getY()-zx.getY()-200)/60*3);
-				
-				
 			}
-			
-			
 		}
+		
+		
 		
 		
 	}
@@ -574,11 +602,15 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	public void keyPressed(KeyEvent arg0) {
 		// TODO Auto-generated method stub
 		System.out.println(arg0.getKeyCode());
-		if(arg0.getKeyCode()==32){		
+		if(arg0.getKeyCode()==32&&InAnimation!=true){		
 			//StdAudio.stoploop(false);
 			StdAudio.stopInBackground();
-			StdAudio.playInBackground("/audio/Examiniation Moderate 2001(Av955216805,P5).wav");
+			StdAudio.playInBackground("/audio/ends.wav");
 			start = true;
+		}
+		else if (arg0.getKeyCode()==32&& InAnimation==true) {
+			final_hit+= 1;
+			enemy.changePicture("/imgs/yj1-崩坏.gif");
 		}
 		if(arg0.getKeyCode()==81) {
 			reset();
