@@ -75,7 +75,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	 */
 	public void init() {
 		//timer & score
-		roundTimer = 1;
+		roundTimer = 30;
 		score = 0;
 		time = 0;
 		trans=0.5f;
@@ -99,11 +99,13 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 		
 		// cbt setup
 		cbt.setXY(-1500, 0);
+		cbt.toggleHitBox();
 		
 		// zx setup
 		zx.setScale(0.4, 0.4);
 		zx.setXY(800, 650);
 		zx.setVx(dog_speed);
+		zx.setVy(0);
 //		zx.setWidth(500);
 //		zx.setHeight(300);
 		zx.toggleHitBox();
@@ -141,6 +143,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	
 	public void reset() {
 		init();
+		cbt.toggleHitBox();
 		enemy.setVx(0);
 		enemy.setVy(0);
 		enemy.toggleHitBox();
@@ -212,6 +215,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			StdAudio.playInBackground("/audio/Phoenix Wright Objection! 2001(Av955216805,P7).wav");
 		}
 		if (cbt.getX()<-500){
+			cbt.setScale(1.0, 1.0);
 			objection.setXY(-1000, -1000);
 			cbt.changePicture("/imgs/cbt1-集中.png");
 			cbt.setVx(70);
@@ -223,11 +227,12 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			bg.setScale(10, 20);
 			if(wait_black >=(int)60*1.5) {
 				if (wait_black==(int)60*1.5) {
-					StdAudio.playInBackground("/imgs/Objection_Audio.wav");
+					StdAudio.playInBackground("/audio/phoenix-objection.wav");
 				}
 				cbt.setScale(1.5, 1.5);
 				cbt.setXY(-500, 50);
 				cbt.changePicture("/imgs/cbt1-异议.png");
+				cbt.toggleHitBox();
 				objection.setXY(600, 200);
 				enemy.setVx(2);
 				enemy.changePicture("/imgs/yj1-崩坏.gif");
@@ -257,7 +262,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			if(time==0) {
 				trans = 0.0f;
 				StdAudio.stopInBackground();
-				//StdAudio.playInBackground("/audio/Examiniation Moderate 2001(Av955216805,P5).wav");
+				StdAudio.playInBackground("/audio/Examiniation Moderate 2001(Av955216805,P5).wav");
 			}
 			time += 16; // update time
 			if(time%16==0) {
@@ -265,12 +270,12 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 				if(time%960==0) { //has been 1 second
 					roundTimer -= 1;
 				}
-				if(roundTimer<=0 && score>=12) {
+				if(roundTimer<=0 && score>=10) {
 					InAnimation = true;
 					//t.stop();
 					win_animation();
 				}
-				else if(roundTimer<=0&& score<12) {
+				else if(roundTimer<=0&& score<10) {
 					StdAudio.stopInBackground();
 					StdAudio.playInBackground("/audio/fails.wav");
 					//transition(false);
@@ -343,61 +348,66 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			duck_x += 1;
 			duck_y += 1;
 			
-			// right score
-			int start_score_x = 1520;
-			int start_score_y = 750;
-			int score_width = 200;
-			int score_height = 100;
-			int score_edge = 10;
-			g.setColor(new Color(141, 8, 1));
-			g.fillRect(start_score_x, start_score_y, score_width, score_height);
-			g.setColor(new Color(255, 255, 255));
-			g.fillRect(start_score_x+score_edge, start_score_y+score_edge, score_width-2*score_edge, score_height-2*score_edge);
 			
-			String score_text = "Score";
-			g.setFont(newFont);
-			g.setColor(new Color(141, 8, 1));
-			g.drawString(score_text, start_score_x+4*score_edge+10, start_score_y+4*score_edge);
-			g.drawString(""+score, start_score_x+85, start_score_y+75);
 			
-			//center life box
-			int life_x = 600;
-			int life_y = 750;
-			int life_width = 700;
+//			//center life box
+//			int life_x = 600;
+//			int life_y = 750;
+//			int life_width = 700;
 			int life_height = 200;
 			int life_edge = 20;
-			g.setColor(new Color(3, 63, 99));
-			g.fillRect(life_x, life_y, life_width, life_height);
-			g.setColor(new Color(255, 255, 255));
-			g.fillRect(life_x+life_edge, life_y+life_edge, life_width-2*life_edge, life_height-2*life_edge);
-			
-			// badge=life display
-			int badge_y = 800;
-			int badge_x = 700;
-			
-			badge1.setScale(0.2, 0.2);
-			badge1.setXY(badge_x, badge_y);
-			badge1.paint(g);
-			
-			
+//			g.setColor(new Color(3, 63, 99));
+//			g.fillRect(life_x, life_y, life_width, life_height);
+//			g.setColor(new Color(255, 255, 255));
+//			g.fillRect(life_x+life_edge, life_y+life_edge, life_width-2*life_edge, life_height-2*life_edge);
+//			
+//			// badge=life display
+//			int badge_y = 800;
+//			int badge_x = 700;
+//			
+//			badge1.setScale(0.2, 0.2);
+//			badge1.setXY(badge_x, badge_y);
+//			badge1.paint(g);
 			
 			
 			
-			//Time frame
-			int timebar_x = 200;
-			int timebar_y = 750;
-			int time_width = 300;
-			int time_height = 200;
-			int time_edge = 20;
-			g.setColor(new Color(141, 8, 1));
-			g.fillRect(timebar_x, timebar_y, time_width, time_height);
-			g.setColor(new Color(255, 255, 255));
-			g.fillRect(timebar_x+life_edge, timebar_y+time_edge, time_width-2*time_edge, life_height-2*time_edge);
+			if(!InAnimation) {
+				// right score
+				int start_score_x = 1520;
+				int start_score_y = 750;
+				int score_width = 200;
+				int score_height = 100;
+				int score_edge = 10;
+				g.setColor(new Color(141, 8, 1));
+				g.fillRect(start_score_x, start_score_y, score_width, score_height);
+				g.setColor(new Color(255, 255, 255));
+				g.fillRect(start_score_x+score_edge, start_score_y+score_edge, score_width-2*score_edge, score_height-2*score_edge);
+				
+				String score_text = "Score";
+				g.setFont(newFont);
+				g.setColor(new Color(141, 8, 1));
+				g.drawString(score_text, start_score_x+4*score_edge+10, start_score_y+4*score_edge);
+				g.drawString(""+score, start_score_x+85, start_score_y+75);
+				
+				
+				//Time frame
+				int timebar_x = 200;
+				int timebar_y = 750;
+				int time_width = 300;
+				int time_height = 200;
+				int time_edge = 20;
+				g.setColor(new Color(141, 8, 1));
+				g.fillRect(timebar_x, timebar_y, time_width, time_height);
+				g.setColor(new Color(255, 255, 255));
+				g.fillRect(timebar_x+life_edge, timebar_y+time_edge, time_width-2*time_edge, life_height-2*time_edge);
+				
+				//Timer display
+				g.setColor(new Color(141, 8, 1));
+				g.drawString("Your time: ",timebar_x+time_edge+40, timebar_y+time_edge+50);
+				g.drawString(""+this.roundTimer,timebar_x+time_edge+120, timebar_y+time_edge+120);
+				
+			}
 			
-			//Timer display
-			g.setColor(new Color(141, 8, 1));
-			g.drawString("Your time: ",timebar_x+time_edge+40, timebar_y+time_edge+50);
-			g.drawString(""+this.roundTimer,timebar_x+time_edge+120, timebar_y+time_edge+120);
 			
 			//paint the dog
 			if(end!=true && InAnimation!=true) {
@@ -575,7 +585,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			duck.setVy(0);
 			if(!catch_duck && (duck.getVx()<=5&&duck.getVy()<=5)) {
 				if(zx.getVy()==0) {
-					this.score += 3;
+					this.score += 1;
 				}
 				System.out.println("You are in socre +1");
 				zx.setVx((duck.getX()-zx.getX()-200)/60*3);
