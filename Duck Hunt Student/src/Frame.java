@@ -75,7 +75,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	 */
 	public void init() {
 		//timer & score
-		roundTimer = 10;
+		roundTimer = 1;
 		score = 0;
 		time = 0;
 		trans=0.5f;
@@ -141,7 +141,6 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	
 	public void reset() {
 		init();
-		start=false;
 		enemy.setVx(0);
 		enemy.setVy(0);
 		enemy.toggleHitBox();
@@ -184,9 +183,9 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 	
 	public void transition(boolean reverse) {
 		if(!reverse) {
-			if(trans>=0.995f) {
+			if(trans>=0.985f) {
 				InTransition = false;
-				trans = 0.995f;
+				trans = 0.985f;
 			}
 			else{
 				InTransition = true;
@@ -274,11 +273,12 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 				else if(roundTimer<=0&& score<12) {
 					StdAudio.stopInBackground();
 					StdAudio.playInBackground("/audio/fails.wav");
-					transition(false);
-					if (InTransition==false) {
-						start =false;
+					//transition(false);
+					end = true;
+					if (!InTransition) {
+						System.out.println("set end to true");
 						end = true;
-						reset();
+
 					}
 				}
 			}
@@ -474,10 +474,12 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			System.out.println("You are in the painting loop");
 			System.out.println("duck x,y: "+ duck.getX()+" "+duck.getY());
 			System.out.println("duck vx, vy: "+ duck.getVx()+ " "+ duck.getVy());
-			
+			System.out.println("InTransition: "+ InTransition);
+			System.out.println("Trans: "+ trans);
 			
 			
 			if (end) {
+				System.out.println("Restart the game");
 				reset();
 			}
 		}
@@ -506,7 +508,7 @@ public class Frame extends JPanel implements ActionListener, MouseListener, KeyL
 			System.out.println("time: "+time);
 			System.out.println("start: "+start);
 			System.out.println("end: "+end);
-			
+			System.out.println("InTransition: "+ InTransition);
 
 		}
 		
